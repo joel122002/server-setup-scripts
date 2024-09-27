@@ -23,8 +23,8 @@ sudo certbot --nginx -d jellyfinn.mooo.com --non-interactive --agree-tos --email
 # sudo certbot certonly --standalone -d jellyfinn.mooo.com --non-interactive --agree-tos --email joellovesa380@gmail.com
 sudo chown proxy:proxy /etc/letsencrypt/live/jellyfinn.mooo.com/fullchain.pem
 sudo chown proxy:proxy /etc/letsencrypt/live/jellyfinn.mooo.com/privkey.pem
-# curl <URL> | sudo tee /etc/squid/squid.conf > /dev/null
-# curl <URL> | sudo tee /etc/nginx/sites-available/jellyfinn.mooo.com > /dev/null
+curl https://raw.githubusercontent.com/joel122002/server-setup-scripts/refs/heads/main/squid.conf | sudo tee /etc/squid/squid.conf > /dev/null
+curl https://raw.githubusercontent.com/joel122002/server-setup-scripts/refs/heads/main/jellyfinn.mooo.com | sudo tee /etc/nginx/sites-available/jellyfinn.mooo.com > /dev/null
 sudo htpasswd -c /etc/squid/passwords joel
 mkdir openvpnconfigs
 sudo apt-get install acl
