@@ -25,6 +25,7 @@ sudo chown proxy:proxy /etc/letsencrypt/live/jellyfinn.mooo.com/fullchain.pem
 sudo chown proxy:proxy /etc/letsencrypt/live/jellyfinn.mooo.com/privkey.pem
 curl https://raw.githubusercontent.com/joel122002/server-setup-scripts/refs/heads/main/squid.conf | sudo tee /etc/squid/squid.conf > /dev/null
 curl https://raw.githubusercontent.com/joel122002/server-setup-scripts/refs/heads/main/jellyfinn.mooo.com | sudo tee /etc/nginx/sites-available/jellyfinn.mooo.com > /dev/null
+curl https://raw.githubusercontent.com/joel122002/server-setup-scripts/refs/heads/main/sshd_config | sudo tee /etc/ssh/sshd_config > /dev/null
 sudo htpasswd -c /etc/squid/passwords joel
 mkdir openvpnconfigs
 sudo apt-get install acl
