@@ -14,6 +14,23 @@ server {
     # NOTE: The default CSP headers may cause issues with the webOS app
     add_header Content-Security-Policy "default-src https: data: blob: ; img-src 'self' https://* ; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline' https://www.gstatic.com https://www.youtube.com blob:; worker-src 'self' blob:; connect-src 'self'; object-src 'none'; frame-ancestors 'self'";
 
+    # RingAFriendBackend
+    location /prod/ {
+        # Proxy main Jellyfin traffic
+        proxy_pass http://localhost:3000/;
+        proxy_pass_request_headers on;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header X-Forwarded-Host $http_host;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection $http_connection;
+
+        # Disable buffering when the nginx proxy gets very resource heavy upon streaming
+        proxy_buffering off;
+    }
+
     # Jellyfin
     location /jellyfin {
         return 302 $scheme://$host/jellyfin/;
