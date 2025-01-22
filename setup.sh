@@ -98,6 +98,7 @@ sudo sysctl -p
 adapter=$(ip route list default | awk '/default/ {for (i=1; i<=NF; i++) if ($i == "dev") print $(i+1)}')
 
 cat <<EOL >> /etc/wireguard/wg0.conf
+
 PostUp = ufw route allow in on wg0 out on $adapter
 PostUp = iptables -t nat -I POSTROUTING -o $adapter -j MASQUERADE
 PostUp = ip6tables -t nat -I POSTROUTING -o $adapter -j MASQUERADE
@@ -113,4 +114,26 @@ sudo netfilter-persistent save
 # Start wireguard
 sudo systemctl enable wg-quick@wg0.service
 
+###############
+# Client to run
+###############
+
+output_for_gw_and_interface=$(ip route list table main default)
+
+# Extract the gateway and interface from the output
+gateway=$(echo "$output_for_gw_and_interface" | grep -oP '(?<=via )\S+')
+interface=$(echo "$output_for_gw_and_interface" | grep -oP '(?<=dev )\S+')
+
+output_for_inteface_ip=$(ip -brief address show $interface)
+
+# Extract the first IPv4 address
+ip_of_interface=$(echo "$output_for_inteface_ip" | grep -oP '\b\d{1,3}(\.\d{1,3}){3}\b' | head -n 1)
+
+cat <<EOL >> /etc/wireguard/wg0.conf
+
+PostUp = ip rule add table 200 from $ip_of_interface
+PostUp = ip route add table 200 default via $gateway
+PreDown = ip rule delete table 200 from $ip_of_interface
+PreDown = ip route delete table 200 default via $gateway
+EOL
 # Ports to allow 1194/udp 3128/tcp 3129/tcp 80/tcp 443/tcp 2112/tcp
