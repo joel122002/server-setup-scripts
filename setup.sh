@@ -5,8 +5,7 @@ sudo apt-get install netfilter-persistent -y
 curl -O https://raw.githubusercontent.com/angristan/openvpn-install/master/openvpn-install.sh
 chmod +x openvpn-install.sh
 # Run openvpn installation script headlessly
-AUTO_INSTALL=y APPROVE_INSTALL=y DNS=9 ENDPOINT=$(curl -4 ifconfig.me) CLIENT=client sudo ./openvpn-install.sh
-sudo ./openvpn-install.sh
+sudo AUTO_INSTALL=y APPROVE_INSTALL=y APPROVE_IP=y IPV6_SUPPORT=n PORT_CHOICE=1 PROTOCOL_CHOICE=1 COMPRESSION_ENABLED=n DNS=9 ENDPOINT=$(curl -4 ifconfig.me) CUSTOMIZE_ENC=n CLIENT=client ./openvpn-install.sh
 # Create a folder to store all openvpn config files
 mkdir openvpnconfigs
 # Move all openvpn config files to the config folder
