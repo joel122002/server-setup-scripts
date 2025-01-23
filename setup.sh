@@ -50,63 +50,9 @@ sudo systemctl restart ssh
 # Allow reverse SSH port
 sudo iptables -A INPUT -p tcp --dport 2112 -j ACCEPT
 # Install wireguard
-sudo apt install wireguard
-# Create wireguard priv key and set permission only to root
-wg genkey | sudo tee /etc/wireguard/private.key
-sudo chmod go= /etc/wireguard/private.key
-# Derive public key from priv key
-sudo cat /etc/wireguard/private.key | wg pubkey | sudo tee /etc/wireguard/public.key
-privkey=$(sudo cat /etc/wireguard/private.key)
-pubkey=$(cat /etc/wireguard/public.key)
-# Deriving ipv6 subnet
-
-# Generate a timestamp with nanoseconds
-timestamp=$(date +%s%N)
-# Read the machine-id from the system
-machine_id=$(cat /var/lib/dbus/machine-id)
-# Combine timestamp and machine-id, then hash with SHA-1
-hash=$(printf "%s%s" "$timestamp" "$machine_id" | sha1sum | awk '{print $1}')
-# Extract the last 5 bytes of the hash
-last_5_bytes=$(printf "%s" "$hash" | cut -c 31-)
-# Convert the 5 bytes into the IPv6 format (fd prefix)
-ipv6_prefix="fd"
-ipv6_bytes=$(echo "$last_5_bytes" | sed -r 's/(..)(..)(..)(..)(..)/\1:\2:\3:\4:\5/')
-# Construct the IPv6 address
-ipv6_address="$ipv6_prefix:$ipv6_bytes::/64"
-# Wirte to the config file
-cat <<EOL > /etc/wireguard/wg0.conf
-[Interface]
-PrivateKey = $privkey
-Address = 10.8.0.1/24, $ipv6_address
-ListenPort = 51820
-SaveConfig = true
-EOL
-
-# Allow IPv4 and IPv6 forwarding
-
-# File path to sysctl.conf
-sysctl_conf="/etc/sysctl.conf"
-
-# Uncomment the required lines and handle optional spaces around the '=' sign
-sed -i '/^#\s*net\.ipv4\.ip_forward\s*=\s*1/s/^#\s*//' "$sysctl_conf"
-sed -i '/^#\s*net\.ipv6\.conf\.all\.forwarding\s*=\s*1/s/^#\s*//' "$sysctl_conf"
-
-# Reload new values for current terminal session
-sudo sysctl -p
-
-# Get adapter to route traffic through 
-adapter=$(ip route list default | awk '/default/ {for (i=1; i<=NF; i++) if ($i == "dev") print $(i+1)}')
-
-cat <<EOL >> /etc/wireguard/wg0.conf
-
-PostUp = ufw route allow in on wg0 out on $adapter
-PostUp = iptables -t nat -I POSTROUTING -o $adapter -j MASQUERADE
-PostUp = ip6tables -t nat -I POSTROUTING -o $adapter -j MASQUERADE
-PreDown = ufw route delete allow in on wg0 out on $adapter
-PreDown = iptables -t nat -D POSTROUTING -o $adapter -j MASQUERADE
-PreDown = ip6tables -t nat -D POSTROUTING -o $adapter -j MASQUERADE
-EOL
-
+curl -O https://raw.githubusercontent.com/angristan/wireguard-install/refs/heads/master/wireguard-install.sh
+chmod +x ./wireguard-install.sh
+sudo ./wireguard-install.sh
 # Allow wireguard through firewall
 sudo iptables -A INPUT -p udp --dport 51820 -j ACCEPT
 # Save all iptables rules
