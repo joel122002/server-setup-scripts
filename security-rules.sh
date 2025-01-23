@@ -6,6 +6,7 @@ aws ec2 authorize-security-group-ingress --group-id $GROUP_NAME --ip-permissions
 aws ec2 authorize-security-group-ingress --group-id $GROUP_NAME --ip-permissions IpProtocol=udp,FromPort=21116,ToPort=21116,IpRanges="[{CidrIp=0.0.0.0/0,Description='RustDesk Server'}]"
 aws ec2 authorize-security-group-ingress --group-id $GROUP_NAME --ip-permissions IpProtocol=tcp,FromPort=2112,ToPort=2112,IpRanges="[{CidrIp=0.0.0.0/0,Description='Reverse SSH'}]"
 aws ec2 authorize-security-group-ingress --group-id $GROUP_NAME --ip-permissions IpProtocol=udp,FromPort=1194,ToPort=1194,IpRanges="[{CidrIp=0.0.0.0/0,Description='OpenVPN'}]"
-aws ec2 authorize-security-group-ingress --group-id $GROUP_NAME --ip-permissions IpProtocol=udp,FromPort=8080,ToPort=8080,IpRanges="[{CidrIp=0.0.0.0/0,Description='8080'}]"
+aws ec2 authorize-security-group-ingress --group-id $GROUP_NAME --ip-permissions IpProtocol=tcp,FromPort=8080,ToPort=8080,IpRanges="[{CidrIp=0.0.0.0/0,Description='8080'}]"
 aws ec2 authorize-security-group-ingress --group-id $GROUP_NAME --ip-permissions IpProtocol=udp,FromPort=3128,ToPort=3128,IpRanges="[{CidrIp=0.0.0.0/0,Description='Squid HTTP'}]"
 aws ec2 authorize-security-group-ingress --group-id $GROUP_NAME --ip-permissions IpProtocol=udp,FromPort=3129,ToPort=3129,IpRanges="[{CidrIp=0.0.0.0/0,Description='Squid HTTPS'}]"
+aws ec2 authorize-security-group-ingress --group-id $GROUP_NAME --ip-permissions IpProtocol=udp,FromPort=51820,ToPort=51820,IpRanges="[{CidrIp=0.0.0.0/0,Description='WireGuard'}]"
